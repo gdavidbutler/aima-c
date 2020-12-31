@@ -25,11 +25,11 @@ If there is nothing in the "C implementation" column, I haven't gotten that far 
 
 | Pseudo-code Algorithm | C implementation |
 |:----------------------|:-----------------|
-| TABLE-DRIVEN-AGENT | [`tableDrivenAgent.c`] |
-| REFLEX-VACUUM-AGENT | [`reflexVacuumAgent.c`] |
-| SIMPLE-REFLEX-AGENT | [`simpleReflexAgent.c`] |
-| MODEL-BASED-REFLEX-AGENT | [`modelBasedReflexAgent.c`] |
-| SIMPLE-PROBLEM-SOLVING-AGENT | [`simpleProblemSolvingAgent.c`] |
+| TABLE-DRIVEN-AGENT | [tableDrivenAgent.c] |
+| REFLEX-VACUUM-AGENT | (reflexVacuumAgent.c) |
+| SIMPLE-REFLEX-AGENT | [simpleReflexAgent.c](simpleReflexAgent.c) |
+| MODEL-BASED-REFLEX-AGENT | [modelBasedReflexAgent.c] |
+| SIMPLE-PROBLEM-SOLVING-AGENT | [simpleProblemSolvingAgent.c] |
 | BEST-FIRST-SEARCH | |
 | BREADTH-FIRST-SEARCH | |
 | ITERATIVE-DEEPENING-SEARCH | |
