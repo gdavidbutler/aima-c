@@ -1,6 +1,6 @@
 /*
  * aima-c - C implementation of algorithms from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
- * Copyright (C) 2019 G. David Butler <gdb@dbSystems.com>
+ * Copyright (C) 2021 G. David Butler <gdb@dbSystems.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,22 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include "environment.h"
+/* put malloc'd instances of this on the percept channel */
+struct modelBasedReflexAgentPercept {
+  int dummy;
+};
 
-environment_t *
-newEnvironment(
-){
-  environment_t *environment;
+/* get malloc'd instances of this on the action channel */
+struct modelBasedReflexAgentAction {
+  int dummy;
+};
 
-  if ((environment = malloc(sizeof(*environment))))
-    environment->opaque = 0;
-  return environment;
-}
-
+/* agent implementation */
 void
-deleteEnvironment(
-  environment_t *self
-){
-  free(self);
-}
+modelBasedReflexAgent(
+  struct agent *context
+);

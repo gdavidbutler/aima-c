@@ -1,6 +1,6 @@
 /*
  * aima-c - C implementation of algorithms from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
- * Copyright (C) 2019 G. David Butler <gdb@dbSystems.com>
+ * Copyright (C) 2021 G. David Butler <gdb@dbSystems.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,32 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "chan.h"
-#include "agent.h"
-#include "tableDrivenAgent.h"
-#include "reflexVacuumAgent.h"
-#include "simpleReflexAgent.h"
-#include "modelBasedReflexAgent.h"
-#include "simpleProblemSolvingAgent.h"
+/* put malloc'd instances of this on the percept channel */
+struct tableDrivenAgentPercept {
+  int dummy;
+};
 
-int
-main(
-){
-  chan_t *percept;
-  chan_t *action;
+/* get malloc'd instances of this on the action channel */
+struct tableDrivenAgentAction {
+  int dummy;
+};
 
-  /* dummy example */
-  percept = action = 0;
-  if (!(percept = chanCreate(0,0,0))
-   || !(action = chanCreate(0,0,0))
-   || !agent(tableDrivenAgent, percept, action))
-    return (-1);
-
-  /* connect action to something */
-  /* connect percept to something */
-
-  /* use the main thread for something or block for shutdown on action */
-  chanClose(percept);
-  chanClose(action);
-  return (0);
-}
+/* agent implementation */
+void
+tableDrivenAgent(
+  struct agent *context
+);

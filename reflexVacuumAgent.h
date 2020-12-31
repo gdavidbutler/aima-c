@@ -1,6 +1,6 @@
 /*
  * aima-c - C implementation of algorithms from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
- * Copyright (C) 2019 G. David Butler <gdb@dbSystems.com>
+ * Copyright (C) 2021 G. David Butler <gdb@dbSystems.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,10 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* an environment - what an agent perceives and acts within */
-typedef struct environment {
-  void *opaque;
-} environment_t;
+/* put malloc'd instances of this on the percept channel */
+struct reflexVacuumAgentPercept {
+  enum {
+    reflexVacuumAgentPerceptLocationA
+   ,reflexVacuumAgentPerceptLocationB
+  } location;
+  enum {
+    reflexVacuumAgentPerceptStatusDirty
+  } status;
+};
 
-environment_t *newEnvironment();
-void deleteEnvironment(environment_t *self);
+/* get malloc'd instances of this on the action channel */
+struct reflexVacuumAgentAction {
+  enum {
+    reflexVacuumAgentActionActionSuck
+   ,reflexVacuumAgentActionActionRight
+   ,reflexVacuumAgentActionActionLeft
+  } action;
+};
+
+/* agent implementation */
+void
+reflexVacuumAgent(
+  struct agent *context
+);

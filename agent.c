@@ -1,6 +1,6 @@
 /*
  * aima-c - C implementation of algorithms from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
- * Copyright (C) 2019 G. David Butler <gdb@dbSystems.com>
+ * Copyright (C) 2021 G. David Butler <gdb@dbSystems.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,34 +17,32 @@
  */
 
 #include <stdlib.h>
+#include <pthread.h>
+#include "chan.h"
 #include "agent.h"
 
-static void
-agentFunction(
-  agent_t *agent
+int
+agent(
+  void implementation(struct agent *)
+ ,chan_t *percept
+ ,chan_t *action
 ){
-  (void)*agent;
-}
-
-agent_t *
-newAgent(
-){
-  agent_t *agent;
-
-  if ((agent = malloc(sizeof(*agent)))) {
-    agent->opaque = 0;
-    agent->sensor.opaque = 0;
-    agent->actuator.opaque = 0;
-    agent->perceptSequence.percept = 0;
-    agent->perceptSequence.perceptCount = 0;
-    agent->function = agentFunction;
+  struct agent *x;
+  pthread_t p;
+  
+  if (!implementation
+   || !percept
+   || !action
+   || !(x = malloc(sizeof (*x))))
+    return (1);
+  x->percept = chanOpen(percept);
+  x->action = chanOpen(action);
+  if (pthread_create(&p, 0, (void *(*)(void *))implementation, x)) {
+    chanClose(x->percept);
+    chanClose(x->action);
+    free(x);
+    return (2);
   }
-  return agent;
-}
-
-void
-deleteAgent(
-  agent_t *self
-){
-  free(self);
+  pthread_detach(p);
+  return (0);
 }
