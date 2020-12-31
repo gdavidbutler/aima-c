@@ -34,7 +34,7 @@ main(
   percept = action = 0;
   if (!(percept = chanCreate(0,0,0))
    || !(action = chanCreate(0,0,0))
-   || !agent(tableDrivenAgent, percept, action))
+   || agent(tableDrivenAgent, percept, action))
     return (-1);
 
   /* connect action to something */
