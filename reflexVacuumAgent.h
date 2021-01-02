@@ -19,22 +19,24 @@
 /* put malloc'd instances of this on the percept channel */
 struct reflexVacuumAgentPercept {
   enum {
-    reflexVacuumAgentPerceptLocationA
-   ,reflexVacuumAgentPerceptLocationB
+    locationA = 1
+   ,locationB
   } location;
   enum {
-    reflexVacuumAgentPerceptStatusDirty
+    statusDirty = 1
   } status;
 };
 
 /* get malloc'd instances of this on the action channel */
 struct reflexVacuumAgentAction {
   enum {
-    reflexVacuumAgentActionActionSuck
-   ,reflexVacuumAgentActionActionRight
-   ,reflexVacuumAgentActionActionLeft
+    actionSuck = 1
+   ,actionRight
+   ,actionLeft
   } action;
 };
+
+extern const char *reflexVacuumAgentActionAction[];
 
 /* agent implementation */
 void

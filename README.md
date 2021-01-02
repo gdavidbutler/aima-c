@@ -1,23 +1,22 @@
 ## aima-c
 
-[C programming language](https://en.wikipedia.org/wiki/C_(programming_language)) implementation of [aima-pseudocode](https://github.com/aimacode/aima-pseudocode) from [Russell And Norvig's "Artificial Intelligence - A Modern Approach"](http://aima.cs.berkeley.edu).
+[C programming language](https://en.wikipedia.org/wiki/C_(programming_language)) implementation of [aima-pseudocode](https://github.com/aimacode/aima-pseudocode) from [Russell And Norvig's "Artificial Intelligence - A Modern Approach, Fourth Edition"](http://aima.cs.berkeley.edu).
 
 [Why C](https://sqlite.org/whyc.html)?
 It is the best "get it done" computer programming language.
 
 From the [book's preface](http://aima.cs.berkeley.edu/newchap00.pdf), "The main unifying theme is the idea of an [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent)."
-C is an imperative procedural language with a caller / callee model, but there is no direct support for a [software agent](https://en.wikipedia.org/wiki/Software_agent) computing model.
-C also directly supports structured programming, but there is no direct support for complex data models or access methods.
-And there is no direct support for dynamic memory either.
+C is an imperative procedural language with no direct support for a [software agent](https://en.wikipedia.org/wiki/Software_agent) computing model.
+C is a structured programming language with no direct support for data access methods.
+And there is no direct support for dynamic memory.
 Or I/O.
 But in a proper environemnt, with C callable routines, these are not limitations.
 
 Dependencies:
 * [libc](https://en.wikipedia.org/wiki/C_standard_library) - of course, restricted to C99 features
-* [libm](https://en.wikipedia.org/wiki/C_mathematical_functions#libm) - of course
-* [pthreads](https://en.wikipedia.org/wiki/POSIX_Threads) - to support concurrency and parallelism
-* [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - an asynchronous [CSP](https://en.wikipedia.org/wiki/Communicating_sequential_processes) model
-* [SQLite](https://sqlite.org) - a declarative data language and engine
+* [pthreads](https://en.wikipedia.org/wiki/POSIX_Threads) - for concurrency and parallelism
+* [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - for an asynchronous [CSP](https://en.wikipedia.org/wiki/Communicating_sequential_processes) model
+* [SQLite](https://sqlite.org) - for a declarative data language and engine
 
 If there is nothing in the "C implementation" column, I haven't gotten that far yet.
 
@@ -25,11 +24,11 @@ If there is nothing in the "C implementation" column, I haven't gotten that far 
 
 Pseudo-code Algorithm | C implementation
 ----------------------|-----------------
-TABLE-DRIVEN-AGENT | [tableDrivenAgent](tableDrivenAgent.c)
+TABLE-DRIVEN-AGENT | algorithm template
 REFLEX-VACUUM-AGENT | [reflexVacuumAgent](reflexVacuumAgent.c)
-SIMPLE-REFLEX-AGENT | [simpleReflexAgent](simpleReflexAgent.c)
-MODEL-BASED-REFLEX-AGENT | [modelBasedReflexAgent](modelBasedReflexAgent.c)
-SIMPLE-PROBLEM-SOLVING-AGENT | [simpleProblemSolvingAgent](simpleProblemSolvingAgent.c)
+SIMPLE-REFLEX-AGENT | algorithm template
+MODEL-BASED-REFLEX-AGENT | algorithm template
+SIMPLE-PROBLEM-SOLVING-AGENT | algorithm template
 BEST-FIRST-SEARCH |
 BREADTH-FIRST-SEARCH |
 ITERATIVE-DEEPENING-SEARCH |

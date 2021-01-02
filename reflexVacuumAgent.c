@@ -26,33 +26,31 @@ void
 reflexVacuumAgent(
   struct agent *context
 ){
-  struct reflexVacuumAgentPercept *percept;
+  struct reflexVacuumAgentPercept *perceptM;
 
   pthread_cleanup_push((void(*)(void*))free, context);
   pthread_cleanup_push((void(*)(void*))chanClose, context->percept);
   pthread_cleanup_push((void(*)(void*))chanClose, context->action);
-  while (chanOp(0, context->percept, (void **)&percept, chanOpGet) == chanOsGet && percept) {
+  while (chanOp(0, context->percept, (void **)&perceptM, chanOpGet) == chanOsGet && perceptM) {
     struct reflexVacuumAgentAction *actionM;
 
-    if ((actionM = malloc(sizeof (*actionM)))) {
-      if (percept->status == reflexVacuumAgentPerceptStatusDirty)
-        actionM->action = reflexVacuumAgentActionActionSuck;
-      else if (percept->location == reflexVacuumAgentPerceptLocationA)
-        actionM->action = reflexVacuumAgentActionActionRight;
-      else if (percept->location == reflexVacuumAgentPerceptLocationB)
-        actionM->action = reflexVacuumAgentActionActionLeft;
-      else {
+    if ((actionM = calloc(1, sizeof (*actionM)))) {
+      if (perceptM->status == statusDirty)
+        actionM->action = actionSuck;
+      else if (perceptM->location == locationA)
+        actionM->action = actionRight;
+      else if (perceptM->location == locationB)
+        actionM->action = actionLeft;
+      if (chanOp(0, context->action, (void **)&actionM, chanOpPut) != chanOsPut) {
         free(actionM);
-        actionM = 0;
+        break;
       }
     }
-    free(percept);
-    if (actionM && chanOp(0, context->action, (void **)&actionM, chanOpPut) != chanOsPut) {
-      free(actionM);
-      break;
-    }
+    free(perceptM);
   }
   pthread_cleanup_pop(1); /* chanClose(context->action) */
   pthread_cleanup_pop(1); /* chanClose(context->percept) */
   pthread_cleanup_pop(1); /* free(context) */
 }
+
+const char *reflexVacuumAgentActionAction[] = { "Unknown", "Suck", "Right", "Left" };

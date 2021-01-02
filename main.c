@@ -1,6 +1,6 @@
 /*
  * aima-c - C implementation of algorithms from Russell And Norvig's "Artificial Intelligence - A Modern Approach"
- * Copyright (C) 2019 G. David Butler <gdb@dbSystems.com>
+ * Copyright (C) 2021 G. David Butler <gdb@dbSystems.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,32 +16,62 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "chan.h"
 #include "agent.h"
-#include "tableDrivenAgent.h"
 #include "reflexVacuumAgent.h"
-#include "simpleReflexAgent.h"
-#include "modelBasedReflexAgent.h"
-#include "simpleProblemSolvingAgent.h"
 
 int
 main(
 ){
   chan_t *percept;
   chan_t *action;
+  struct reflexVacuumAgentPercept *perceptM;
+  struct reflexVacuumAgentAction *actionM;
+  int ret;
 
-  /* dummy example */
+  chanInit(realloc, free);
+
   percept = action = 0;
+  ret = 3;
   if (!(percept = chanCreate(0,0,0))
    || !(action = chanCreate(0,0,0))
-   || agent(tableDrivenAgent, percept, action))
-    return (-1);
+   || (ret = agent(reflexVacuumAgent, percept, action)))
+    goto exit;
+  ret = 1;
 
-  /* connect action to something */
-  /* connect percept to something */
+  if (!(perceptM = calloc(1, sizeof (*perceptM))))
+    goto exit;
+  perceptM->status = statusDirty;
+  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
+   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
+    goto exit;
+  printf("percept Dirty action %s\n", reflexVacuumAgentActionAction[actionM->action]);
+  free(actionM);
 
-  /* use the main thread for something or block for shutdown on action */
+  if (!(perceptM = calloc(1, sizeof (*perceptM))))
+    goto exit;
+  perceptM->location = locationA;
+  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
+   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
+    goto exit;
+  printf("percept LocaitonA action %s\n", reflexVacuumAgentActionAction[actionM->action]);
+  free(actionM);
+
+  if (!(perceptM = calloc(1, sizeof (*perceptM))))
+    goto exit;
+  perceptM->location = locationB;
+  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
+   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
+    goto exit;
+  printf("percept LocaitonB action %s\n", reflexVacuumAgentActionAction[actionM->action]);
+  free(actionM);
+
+  ret = 0;
+exit:
+  chanShut(percept);
   chanClose(percept);
   chanClose(action);
-  return (0);
+  return (ret);
 }
