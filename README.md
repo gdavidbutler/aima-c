@@ -5,18 +5,35 @@
 [Why C](https://sqlite.org/whyc.html)?
 It is the best "get it done" computer programming language.
 
-From the [book's preface](http://aima.cs.berkeley.edu/newchap00.pdf), "The main unifying theme is the idea of an [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent)."
-C is an imperative procedural language with no direct support for a [software agent](https://en.wikipedia.org/wiki/Software_agent) computing model.
-C is a structured programming language with no direct support for data access methods.
-And there is no direct support for dynamic memory.
-Or I/O.
-But in a proper environemnt, with C callable routines, these are not limitations.
+C is a *small* programming language:
+* The [first edition book](https://archive.org/details/TheCProgrammingLanguageFirstEdition) is 236 pages.
+* The [second edition book](https://archive.org/details/the_c_programming_language_2_20181213) is 288 pages.
+Most of the pages in both are tutorial and discussion of the standard library (libc).
+The "reference manual" section is only 35 pages and 49 pages respectively.
+
+Why is C considered *hard*?
+The usual answer is *pointers*.
+The real answer is *choice*.
+C only provides portable access to general processor operations on memory.
+A couple of points to drive it home.
+The language has no support for:
+* "heap" or dynamic memory
+* I/O
+C callable routines must be provided to support these and others (usually the standard C library, libc).
+The sheet of paper is almost completely blank.
+
+There are a few conventions used in the book that are especially challenging for C:
+* From the [preface](http://aima.cs.berkeley.edu/newchap00.pdf), "The main unifying theme is the idea of an [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent)."
+* From Appendix B "notes on languages and [algorithms](http://aima.cs.berkeley.edu/algorithms.pdf)", "persistent variables" and "yield".
+They can be implemented using various [coroutine](https://en.wikipedia.org/wiki/Coroutine#Implementations_for_C) techniques.
+Even more choices.
+My choice, for possible parallelism in addition to concurrency, is [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads).
 
 Dependencies:
 * [libc](https://en.wikipedia.org/wiki/C_standard_library) - of course, restricted to C99 features
-* [pthreads](https://en.wikipedia.org/wiki/POSIX_Threads) - for concurrency and parallelism
-* [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - for an asynchronous [CSP](https://en.wikipedia.org/wiki/Communicating_sequential_processes) model
-* [SQLite](https://sqlite.org) - for a declarative data language and engine
+* [pthread](https://en.wikipedia.org/wiki/POSIX_Threads) - concurrency (and parallelism when multi-cores are available)
+* [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - anonymous pthread coordinating "channel"
+* [SQLite](https://sqlite.org) - declarative data language and engine
 
 If there is nothing in the "C implementation" column, I haven't gotten that far yet.
 
@@ -24,11 +41,11 @@ If there is nothing in the "C implementation" column, I haven't gotten that far 
 
 Pseudo-code Algorithm | C implementation
 ----------------------|-----------------
-TABLE-DRIVEN-AGENT | algorithm template
+TABLE-DRIVEN-AGENT |
 REFLEX-VACUUM-AGENT | [reflexVacuumAgent](reflexVacuumAgent.c)
-SIMPLE-REFLEX-AGENT | algorithm template
-MODEL-BASED-REFLEX-AGENT | algorithm template
-SIMPLE-PROBLEM-SOLVING-AGENT | algorithm template
+SIMPLE-REFLEX-AGENT |
+MODEL-BASED-REFLEX-AGENT |
+SIMPLE-PROBLEM-SOLVING-AGENT |
 BEST-FIRST-SEARCH |
 BREADTH-FIRST-SEARCH |
 ITERATIVE-DEEPENING-SEARCH |
