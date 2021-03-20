@@ -10,7 +10,7 @@ Yet C is a *small* programming language:
 * The [first edition book](https://archive.org/details/TheCProgrammingLanguageFirstEdition) is 236 pages.
 * The [second edition book](https://archive.org/details/the_c_programming_language_2_20181213) is 288 pages.
 
-Most of the pages in both are tutorial and discussion of the standard library (libc).
+Most of the pages are tutorial and discussion of the [C standard library](https://en.wikipedia.org/wiki/C_standard_library).
 The "reference manual" section is only 35 pages and 49 pages respectively.
 
 Why is C considered *hard*?
@@ -20,9 +20,9 @@ C only provides portable access to general processor operations on memory.
 The language has no support for:
 
 * "heap" or dynamic memory
-* I/O
+* input and output
 
-C callable routines must be provided to support these and others (usually the standard C library, libc).
+C callable routines (e.g. the C standard library) can be provided to support these and other features.
 The sheet of paper is almost completely blank.
 
 There are a few conventions used in the book that are especially challenging for C:
@@ -37,7 +37,7 @@ My choice, for possible parallelism in addition to concurrency, is [POSIX Thread
 Dependencies:
 
 * [libc](https://en.wikipedia.org/wiki/C_standard_library) - of course, restricted to C99 features
-* [pthread](https://en.wikipedia.org/wiki/POSIX_Threads) - concurrency (and parallelism when multi-cores are available)
+* [libpthread](https://en.wikipedia.org/wiki/POSIX_Threads) - concurrency (and parallelism when multi-cores are available)
 * [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - anonymous pthread coordinating "channel"
 
 If there is nothing in the "C implementation" column, I haven't gotten that far yet.
