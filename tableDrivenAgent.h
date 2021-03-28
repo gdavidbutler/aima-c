@@ -16,43 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-struct reflexVacuumAgentPercept {
-  enum {
-    locationA
-   ,locationB
-  } location;
-  enum {
-    statusClean /* not in pseudocode */
-   ,statusDirty
-  } status;
+struct tableDrivenAgentPercept {
+  int dummy;
 };
 
-struct reflexVacuumAgentPercept *
-reflexVacuumAgentPerceptNew(
+struct tableDrivenAgentPercept *
+tableDrivenAgentPerceptNew(
   void
 );
 
 void
-reflexVacuumAgentPerceptFree(
-  struct reflexVacuumAgentPercept *
+tableDrivenAgentPerceptFree(
+  struct tableDrivenAgentPercept *
 );
 
-struct reflexVacuumAgentAction {
-  enum {
-    actionSuck
-   ,actionRight
-   ,actionLeft
-  } action;
+struct tableDrivenAgentAction {
+  int dummy;
 };
 
-struct reflexVacuumAgentAction *
-reflexVacuumAgentActionNew(
+struct tableDrivenAgentAction *
+tableDrivenAgentActionNew(
   void
 );
 
 void
-reflexVacuumAgentActionFree(
-  struct reflexVacuumAgentAction *
+tableDrivenAgentActionFree(
+  struct tableDrivenAgentAction *
 );
 
 /*
@@ -66,7 +55,7 @@ reflexVacuumAgentActionFree(
  */
 
 int
-reflexVacuumAgent(
+tableDrivenAgent(
  chan_t **sensor
 ,chan_t **actuator
 );

@@ -5,48 +5,41 @@
 [Why C](https://sqlite.org/whyc.html)?
 It is the best "get it done" computer programming language.
 
-Yet C is a *small* programming language:
-
-* The [first edition book](https://archive.org/details/TheCProgrammingLanguageFirstEdition) is 236 pages.
-* The [second edition book](https://archive.org/details/the_c_programming_language_2_20181213) is 288 pages.
-
-Most of the pages are tutorial and discussion of the [C standard library](https://en.wikipedia.org/wiki/C_standard_library).
+C is a *small* programming language.
+The [first edition book](https://archive.org/details/TheCProgrammingLanguageFirstEdition) is 236 pages.
+The [second edition book](https://archive.org/details/the_c_programming_language_2_20181213) is 288 pages.
 The "reference manual" section is only 35 pages and 49 pages respectively.
 
-Why is C considered *hard*?
+Then why is C considered *hard*?
 The usual answer is *pointers*.
-The real answer is *choice*.
+The real answer is **choice**.
 C only provides portable access to general processor operations on memory.
-The language has no support for:
+The language has no support for dynamic memory, input or output.
+C callable routines (e.g. the [C standard library](https://en.wikipedia.org/wiki/C_standard_library)) must be provided to enable C programs to interface with an environment.
+Everything else is choice.
 
-* "heap" or dynamic memory
-* input and output
-
-C callable routines (e.g. the C standard library) can be provided to support these and other features.
-The sheet of paper is almost completely blank.
-
-There are a few conventions used in the book that are especially challenging for C:
+For example, there are a few conventions used in the book that neither C nor the standard library address:
 
 * From the [preface](http://aima.cs.berkeley.edu/newchap00.pdf), "The main unifying theme is the idea of an [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent)."
-* From Appendix B "notes on languages and [algorithms](http://aima.cs.berkeley.edu/algorithms.pdf)", "persistent variables" and "yield".
+* From Appendix B "notes on languages and algorithms", concepts "persistent variables" and "yield".
 
-They can be implemented using various [coroutine](https://en.wikipedia.org/wiki/Coroutine#Implementations_for_C) techniques.
-Even more choice.
-My choice, for possible parallelism in addition to concurrency, is [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads).
+These concepts can be implemented using various [coroutine](https://en.wikipedia.org/wiki/Coroutine#Implementations_for_C) techniques.
+However, for possible parallelism in addition to concurrency, [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads) and [channels](https://github.com/gdavidbutler/pthreadChannel) are used.
 
-Dependencies:
+Except where C provides support (e.g. functions), threads and channels are used extensively:
 
-* [libc](https://en.wikipedia.org/wiki/C_standard_library) - of course, restricted to C99 features
-* [libpthread](https://en.wikipedia.org/wiki/POSIX_Threads) - concurrency (and parallelism when multi-cores are available)
-* [pthreadChannel](https://github.com/gdavidbutler/pthreadChannel) - anonymous pthread coordinating "channel"
+* Environments are threads.
+* Agents are threads.
+* Sensors are channels.
+* Actuators are channels.
 
 If there is nothing in the "C implementation" column, I haven't gotten that far yet.
 
-## Index of Implemented Algorithms
+## Index of implemented [algorithms](http://aima.cs.berkeley.edu/algorithms.pdf)
 
-Pseudo-code Algorithm | C implementation
+Pseudo-code Algorithm | Implementation
 ----------------------|-----------------
-TABLE-DRIVEN-AGENT |
+TABLE-DRIVEN-AGENT | [tableDrivenAgent](tableDrivenAgent.c)
 REFLEX-VACUUM-AGENT | [reflexVacuumAgent](reflexVacuumAgent.c)
 SIMPLE-REFLEX-AGENT |
 MODEL-BASED-REFLEX-AGENT |

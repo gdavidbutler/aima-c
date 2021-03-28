@@ -18,60 +18,104 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "chan.h"
-#include "agent.h"
+#include "tableDrivenAgent.h"
 #include "reflexVacuumAgent.h"
+
+static void
+tableDrivenAgentActuatorOutput(
+  chan_t *actuator
+){
+  struct tableDrivenAgentAction *action;
+
+  while (chanOp(0, actuator, (void **)&action, chanOpGet) == chanOsGet) {
+    printf("tableDrivenAgentAction: %d\n", action->dummy);
+    tableDrivenAgentActionFree(action);
+  }
+  chanClose(actuator);
+}
+
+static void
+reflexVacuumAgentActuatorOutput(
+  chan_t *actuator
+){
+  struct reflexVacuumAgentAction *action;
+
+  while (chanOp(0, actuator, (void **)&action, chanOpGet) == chanOsGet) {
+    printf("reflexVacuumAgentAction: %s\n"
+    ,action->action == actionSuck ? "Suck" :
+     action->action == actionRight ? "Right" :
+     action->action == actionLeft ? "Left" :
+     "unknown");
+    reflexVacuumAgentActionFree(action);
+  }
+  chanClose(actuator);
+}
 
 int
 main(
+  void
 ){
-  chan_t *percept;
-  chan_t *action;
-  struct reflexVacuumAgentPercept *perceptM;
-  struct reflexVacuumAgentAction *actionM;
-  int ret;
+  chan_t *sensor;
+  chan_t *actuator;
+  int i;
+  pthread_t p;
 
   chanInit(realloc, free);
 
-  percept = action = 0;
-  ret = 3;
-  if (!(percept = chanCreate(0,0,0))
-   || !(action = chanCreate(0,0,0))
-   || (ret = agent(reflexVacuumAgent, percept, action)))
-    goto exit;
-  ret = 1;
 
-  if (!(perceptM = calloc(1, sizeof (*perceptM))))
-    goto exit;
-  perceptM->status = statusDirty;
-  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
-   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
-    goto exit;
-  printf("percept Dirty action %s\n", reflexVacuumAgentActionAction[actionM->action]);
-  free(actionM);
+  if ((i = tableDrivenAgent(&sensor, &actuator))) {
+    fprintf(stderr, "tableDrivenAgent failed: %d\n", i);
+    return (1);
+  }
+  if (pthread_create(&p, 0, (void *(*)(void *))tableDrivenAgentActuatorOutput, actuator)) {
+    fprintf(stderr, "pthread_create failed\n");
+    return (1);
+  }
+  {
+    struct tableDrivenAgentPercept *percept;
 
-  if (!(perceptM = calloc(1, sizeof (*perceptM))))
-    goto exit;
-  perceptM->location = locationA;
-  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
-   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
-    goto exit;
-  printf("percept LocaitonA action %s\n", reflexVacuumAgentActionAction[actionM->action]);
-  free(actionM);
+    if (!(percept = calloc(1, sizeof (*percept)))) {
+      fprintf(stderr, "calloc failed\n");
+      return (1);
+    }
+    percept->dummy = 0;
+    if (chanOp(0, sensor, (void **)&percept, chanOpPut) != chanOsPut) {
+      fprintf(stderr, "chanOp failed\n");
+      return (1);
+    }
+  }
+  chanShut(sensor);
+  chanClose(sensor);
+  pthread_join(p, 0);
 
-  if (!(perceptM = calloc(1, sizeof (*perceptM))))
-    goto exit;
-  perceptM->location = locationB;
-  if (chanOp(0, percept, (void **)&perceptM, chanOpPut) != chanOsPut
-   || chanOp(0, action, (void **)&actionM, chanOpGet) != chanOsGet)
-    goto exit;
-  printf("percept LocaitonB action %s\n", reflexVacuumAgentActionAction[actionM->action]);
-  free(actionM);
 
-  ret = 0;
-exit:
-  chanShut(percept);
-  chanClose(percept);
-  chanClose(action);
-  return (ret);
+  if ((i = reflexVacuumAgent(&sensor, &actuator))) {
+    fprintf(stderr, "reflexVacuumAgent failed: %d\n", i);
+    return (1);
+  }
+  if (pthread_create(&p, 0, (void *(*)(void *))reflexVacuumAgentActuatorOutput, actuator)) {
+    fprintf(stderr, "pthread_create failed\n");
+    return (1);
+  }
+  {
+    struct reflexVacuumAgentPercept *percept;
+
+    if (!(percept = calloc(1, sizeof (*percept)))) {
+      fprintf(stderr, "calloc failed\n");
+      return (1);
+    }
+    percept->location = locationB;
+    if (chanOp(0, sensor, (void **)&percept, chanOpPut) != chanOsPut) {
+      fprintf(stderr, "chanOp failed\n");
+      return (1);
+    }
+  }
+  chanShut(sensor);
+  chanClose(sensor);
+  pthread_join(p, 0);
+
+
+  return (0);
 }

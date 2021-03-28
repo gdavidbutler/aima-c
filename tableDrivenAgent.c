@@ -20,34 +20,45 @@
 #include <string.h>
 #include <pthread.h>
 #include "chan.h"
-#include "reflexVacuumAgent.h"
+#include "tableDrivenAgent.h"
 
-struct reflexVacuumAgentPercept *
-reflexVacuumAgentPerceptNew(
+struct tableDrivenAgentPercept *
+tableDrivenAgentPerceptNew(
   void
 ){
-  return (calloc(1, sizeof (struct reflexVacuumAgentPercept)));
+  return (calloc(1, sizeof (struct tableDrivenAgentPercept)));
 }
 
 void
-reflexVacuumAgentPerceptFree(
-  struct reflexVacuumAgentPercept *o
+tableDrivenAgentPerceptFree(
+  struct tableDrivenAgentPercept *o
 ){
   free(o);
 }
 
-struct reflexVacuumAgentAction *
-reflexVacuumAgentActionNew(
+struct tableDrivenAgentAction *
+tableDrivenAgentActionNew(
   void
 ){
-  return (calloc(1, sizeof (struct reflexVacuumAgentAction)));
+  return (calloc(1, sizeof (struct tableDrivenAgentAction)));
 }
 
 void
-reflexVacuumAgentActionFree(
-  struct reflexVacuumAgentAction *o
+tableDrivenAgentActionFree(
+  struct tableDrivenAgentAction *o
 ){
   free(o);
+}
+
+static const struct tableDrivenAgentAction *
+lookup(
+  struct tableDrivenAgentPercept **percepts
+ ,unsigned int perceptsN
+ ,const struct tableDrivenAgentAction *actions
+){
+  (void)percepts;
+  (void)perceptsN;
+  return (actions + 0); /* dummy */
 }
 
 struct impl {
@@ -59,26 +70,33 @@ static void
 impl(
   struct impl *context
 ){
-  struct reflexVacuumAgentPercept *percept;
+  static const struct tableDrivenAgentAction actions[] = {
+   {0} /* dummy */
+  };
+  struct tableDrivenAgentPercept *percept;
+  struct tableDrivenAgentPercept **percepts;
+  unsigned int perceptsN;
 
+  percepts = 0;
+  perceptsN = 0;
   while (chanOp(0, context->sensor, (void **)&percept, chanOpGet) == chanOsGet) {
-    struct reflexVacuumAgentAction *action;
+    void *v;
+    struct tableDrivenAgentAction *action;
 
-    if (!(action = reflexVacuumAgentActionNew()))
+    if (!(v = realloc(percepts, (perceptsN + 1) * sizeof (*percepts))))
       break;
-    if (percept->status == statusDirty)
-      action->action = actionSuck;
-    else if (percept->location == locationA)
-      action->action = actionRight;
-    else if (percept->location == locationB)
-      action->action = actionLeft;
-    else
-      abort(); /* not in pseudocode */
+    percepts = v;
+    *(percepts + perceptsN) = percept;
+    ++perceptsN;
+    if (!(action = tableDrivenAgentActionNew()))
+      break;
+    memcpy(action, lookup(percepts, perceptsN, actions), sizeof (*action));
     if (chanOp(0, context->actuator, (void **)&action, chanOpPut) != chanOsPut) {
-      reflexVacuumAgentActionFree(action);
+      tableDrivenAgentActionFree(action);
       break;
     }
   }
+  free(percepts);
   chanShut(context->sensor);
   chanClose(context->sensor);
   chanShut(context->actuator);
@@ -87,7 +105,7 @@ impl(
 }
   
 int
-reflexVacuumAgent(
+tableDrivenAgent(
   chan_t **sensor
  ,chan_t **actuator
 ){
@@ -98,8 +116,8 @@ reflexVacuumAgent(
     return (1);
   *sensor = 0;
   *actuator = 0;
-  if (!(*sensor = chanCreate(0, 0, (chanSd_t)reflexVacuumAgentPerceptFree))
-   || !(*actuator = chanCreate(0, 0, (chanSd_t)reflexVacuumAgentActionFree))
+  if (!(*sensor = chanCreate(0, 0, (chanSd_t)tableDrivenAgentPerceptFree))
+   || !(*actuator = chanCreate(0, 0, (chanSd_t)tableDrivenAgentActionFree))
    || !(context = malloc(sizeof (*context)))) {
     chanClose(*sensor);
     chanClose(*actuator);
