@@ -33,7 +33,7 @@ Except where C provides support (e.g. functions), threads and channels are used 
 * Sensors are channels.
 * Actuators are channels.
 
-If there is nothing in the "C implementation" column, I haven't gotten that far yet.
+If there is nothing in the "C implementation" column, I haven't gotten that far.
 
 ## Index of implemented [algorithms](http://aima.cs.berkeley.edu/algorithms.pdf)
 

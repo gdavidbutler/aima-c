@@ -20,6 +20,7 @@
 #include <string.h>
 #include <pthread.h>
 #include "chan.h"
+#include "chanFifo.h"
 #include "tableDrivenAgent.h"
 
 struct tableDrivenAgentPercept *
@@ -80,14 +81,18 @@ impl(
   percepts = 0;
   perceptsN = 0;
   while (chanOp(0, context->sensor, (void **)&percept, chanOpGet) == chanOsGet) {
-    void *v;
     struct tableDrivenAgentAction *action;
+#if 0 /* this is what the pseudocode says to do */
+    void *v;
 
     if (!(v = realloc(percepts, (perceptsN + 1) * sizeof (*percepts))))
       break;
     percepts = v;
     *(percepts + perceptsN) = percept;
     ++perceptsN;
+#else /* but since this is dummy */
+    tableDrivenAgentPerceptFree(percept);
+#endif
     if (!(action = tableDrivenAgentActionNew()))
       break;
     memcpy(action, lookup(percepts, perceptsN, actions), sizeof (*action));
@@ -110,15 +115,19 @@ tableDrivenAgent(
  ,chan_t **actuator
 ){
   struct impl *context;
+  void *fifo;
   pthread_t p;
 
   if (!sensor || !actuator)
     return (1);
   *sensor = 0;
   *actuator = 0;
-  if (!(*sensor = chanCreate(0, 0, (chanSd_t)tableDrivenAgentPerceptFree))
-   || !(*actuator = chanCreate(0, 0, (chanSd_t)tableDrivenAgentActionFree))
+  if (!(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
+   || !(*sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
+   || !(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
+   || !(*actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
    || !(context = malloc(sizeof (*context)))) {
+    free(fifo);
     chanClose(*sensor);
     chanClose(*actuator);
     *sensor = 0;

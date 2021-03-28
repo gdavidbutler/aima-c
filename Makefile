@@ -1,5 +1,5 @@
 CHAN_INC=-I../pthreadChannel
-CHAN_OBJ=../pthreadChannel/chan.o
+CHAN_OBJS=../pthreadChannel/chan.o ../pthreadChannel/chanFifo.o
 
 CFLAGS = -I. $(CHAN_INC) -Os -g
 OBJS=main.o tableDrivenAgent.o reflexVacuumAgent.o
@@ -10,7 +10,7 @@ clean:
 	rm -f main $(OBJS)\
 
 main: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(CHAN_OBJ) -lpthread
+	$(CC) -o $@ $(OBJS) $(CHAN_OBJS) -lpthread
 
 main.o: main.c tableDrivenAgent.h
 

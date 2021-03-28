@@ -20,6 +20,7 @@
 #include <string.h>
 #include <pthread.h>
 #include "chan.h"
+#include "chanFifo.h"
 #include "reflexVacuumAgent.h"
 
 struct reflexVacuumAgentPercept *
@@ -74,6 +75,7 @@ impl(
       action->action = actionLeft;
     else
       abort(); /* not in pseudocode */
+    reflexVacuumAgentPerceptFree(percept);
     if (chanOp(0, context->actuator, (void **)&action, chanOpPut) != chanOsPut) {
       reflexVacuumAgentActionFree(action);
       break;
@@ -92,14 +94,17 @@ reflexVacuumAgent(
  ,chan_t **actuator
 ){
   struct impl *context;
+  void *fifo;
   pthread_t p;
 
   if (!sensor || !actuator)
     return (1);
   *sensor = 0;
   *actuator = 0;
-  if (!(*sensor = chanCreate(0, 0, (chanSd_t)reflexVacuumAgentPerceptFree))
-   || !(*actuator = chanCreate(0, 0, (chanSd_t)reflexVacuumAgentActionFree))
+  if (!(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+   || !(*sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
+   || !(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+   || !(*actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
    || !(context = malloc(sizeof (*context)))) {
     chanClose(*sensor);
     chanClose(*actuator);

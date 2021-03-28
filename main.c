@@ -24,7 +24,7 @@
 #include "reflexVacuumAgent.h"
 
 static void
-tableDrivenAgentActuatorOutput(
+tableDrivenAgentActuatorPrint(
   chan_t *actuator
 ){
   struct tableDrivenAgentAction *action;
@@ -37,7 +37,7 @@ tableDrivenAgentActuatorOutput(
 }
 
 static void
-reflexVacuumAgentActuatorOutput(
+reflexVacuumAgentActuatorPrint(
   chan_t *actuator
 ){
   struct reflexVacuumAgentAction *action;
@@ -64,20 +64,24 @@ main(
 
   chanInit(realloc, free);
 
+  /* this main thread and Print threads constitute an environment */
 
+  /* create agents and threads to get actions from agents' actuator */
   if ((i = tableDrivenAgent(&sensor, &actuator))) {
     fprintf(stderr, "tableDrivenAgent failed: %d\n", i);
     return (1);
   }
-  if (pthread_create(&p, 0, (void *(*)(void *))tableDrivenAgentActuatorOutput, actuator)) {
+  if (pthread_create(&p, 0, (void *(*)(void *))tableDrivenAgentActuatorPrint, actuator)) {
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
+
+  /* put percepts on agents' sensor */
   {
     struct tableDrivenAgentPercept *percept;
 
-    if (!(percept = calloc(1, sizeof (*percept)))) {
-      fprintf(stderr, "calloc failed\n");
+    if (!(percept = tableDrivenAgentPerceptNew())) {
+      fprintf(stderr, "tableDrivenAgentPerceptNew failed\n");
       return (1);
     }
     percept->dummy = 0;
@@ -86,24 +90,29 @@ main(
       return (1);
     }
   }
+
+  /* inform the agent there will be no more percepts */
   chanShut(sensor);
   chanClose(sensor);
+  /* wait till the Print threads are notified of agents' death */
   pthread_join(p, 0);
 
+  /* rinse and repeat */
 
   if ((i = reflexVacuumAgent(&sensor, &actuator))) {
     fprintf(stderr, "reflexVacuumAgent failed: %d\n", i);
     return (1);
   }
-  if (pthread_create(&p, 0, (void *(*)(void *))reflexVacuumAgentActuatorOutput, actuator)) {
+  if (pthread_create(&p, 0, (void *(*)(void *))reflexVacuumAgentActuatorPrint, actuator)) {
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
+
   {
     struct reflexVacuumAgentPercept *percept;
 
-    if (!(percept = calloc(1, sizeof (*percept)))) {
-      fprintf(stderr, "calloc failed\n");
+    if (!(percept = reflexVacuumAgentPerceptNew())) {
+      fprintf(stderr, "reflexVacuumAgentPerceptNew failed\n");
       return (1);
     }
     percept->location = locationB;
@@ -112,10 +121,10 @@ main(
       return (1);
     }
   }
+
   chanShut(sensor);
   chanClose(sensor);
   pthread_join(p, 0);
-
 
   return (0);
 }
