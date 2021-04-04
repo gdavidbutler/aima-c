@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "chan.h"
+#include "chanFifo.h"
 #include "tableDrivenAgent.h"
 #include "reflexVacuumAgent.h"
 
@@ -57,6 +58,7 @@ int
 main(
   void
 ){
+  void *fifo;
   chan_t *sensor;
   chan_t *actuator;
   int i;
@@ -66,8 +68,16 @@ main(
 
   /* this main thread and Print threads constitute an environment */
 
+  if (!(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
+   || !(sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
+   || !(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
+   || !(actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))) {
+    fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
+    return (1);
+  }
+
   /* create agents and threads to get actions from agents' actuator */
-  if ((i = tableDrivenAgent(&sensor, &actuator))) {
+  if ((i = tableDrivenAgent(sensor, actuator))) {
     fprintf(stderr, "tableDrivenAgent failed: %d\n", i);
     return (1);
   }
@@ -75,6 +85,7 @@ main(
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
+  actuator = 0;
 
   /* put percepts on agents' sensor */
   {
@@ -94,12 +105,21 @@ main(
   /* inform the agent there will be no more percepts */
   chanShut(sensor);
   chanClose(sensor);
+  sensor = 0;
   /* wait till the Print threads are notified of agents' death */
   pthread_join(p, 0);
 
   /* rinse and repeat */
 
-  if ((i = reflexVacuumAgent(&sensor, &actuator))) {
+  if (!(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+   || !(sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
+   || !(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+   || !(actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))) {
+    fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
+    return (1);
+  }
+
+  if ((i = reflexVacuumAgent(sensor, actuator))) {
     fprintf(stderr, "reflexVacuumAgent failed: %d\n", i);
     return (1);
   }
@@ -107,6 +127,7 @@ main(
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
+  actuator = 0;
 
   {
     struct reflexVacuumAgentPercept *percept;
@@ -124,6 +145,7 @@ main(
 
   chanShut(sensor);
   chanClose(sensor);
+  sensor = 0;
   pthread_join(p, 0);
 
   return (0);

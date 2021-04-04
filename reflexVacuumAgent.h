@@ -67,6 +67,6 @@ reflexVacuumAgentActionFree(
 
 int
 reflexVacuumAgent(
- chan_t **sensor
-,chan_t **actuator
+ chan_t *sensor
+,chan_t *actuator
 );

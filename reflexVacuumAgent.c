@@ -90,37 +90,21 @@ impl(
   
 int
 reflexVacuumAgent(
-  chan_t **sensor
- ,chan_t **actuator
+  chan_t *sensor
+ ,chan_t *actuator
 ){
   struct impl *context;
-  void *fifo;
   pthread_t p;
 
   if (!sensor || !actuator)
     return (1);
-  *sensor = 0;
-  *actuator = 0;
-  if (!(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
-   || !(*sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
-   || !(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
-   || !(*actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
-   || !(context = malloc(sizeof (*context)))) {
-    chanClose(*sensor);
-    chanClose(*actuator);
-    *sensor = 0;
-    *actuator = 0;
+  if (!(context = malloc(sizeof (*context))))
     return (2);
-  }
-  context->sensor = chanOpen(*sensor);
-  context->actuator = chanOpen(*actuator);
+  context->sensor = chanOpen(sensor);
+  context->actuator = chanOpen(actuator);
   if (pthread_create(&p, 0, (void *(*)(void *))impl, context)) {
     chanClose(context->sensor);
     chanClose(context->actuator);
-    chanClose(*sensor);
-    chanClose(*actuator);
-    *sensor = 0;
-    *actuator = 0;
     free(context);
     return (2);
   }

@@ -56,6 +56,6 @@ tableDrivenAgentActionFree(
 
 int
 tableDrivenAgent(
- chan_t **sensor
-,chan_t **actuator
+ chan_t *sensor
+,chan_t *actuator
 );
