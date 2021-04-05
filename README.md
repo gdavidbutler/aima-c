@@ -14,7 +14,7 @@ Then why is C considered *hard*?
 The usual answer is *pointers*.
 The real answer is **choice**.
 C only provides portable access to general processor operations on memory.
-The language has no support for dynamic memory or I/O (input / output)
+The language has no support for dynamic memory or I/O (input / output).
 C callable routines (e.g. the [C standard library](https://en.wikipedia.org/wiki/C_standard_library)) must be provided to enable C programs to interface with an environment.
 Everything else is choice.
 
@@ -36,15 +36,14 @@ Pseudo-code Algorithm | Implementation
 ----------------------|-----------------
 TABLE-DRIVEN-AGENT | [tableDrivenAgent](tableDrivenAgent.c)
 REFLEX-VACUUM-AGENT | [reflexVacuumAgent](reflexVacuumAgent.c)
-SIMPLE-REFLEX-AGENT |
-MODEL-BASED-REFLEX-AGENT |
-SIMPLE-PROBLEM-SOLVING-AGENT |
+SIMPLE-REFLEX-AGENT | [simpleReflexAgent](simpleReflexAgent.c)
+MODEL-BASED-REFLEX-AGENT | [modelBasedReflexAgent](modelBasedReflexAgent.c)
 BEST-FIRST-SEARCH |
 BREADTH-FIRST-SEARCH |
-ITERATIVE-DEEPENING-SEARCH |
-BIBF-SEARCH |
 UNIFORM-COST-SEARCH |
+ITERATIVE-DEEPENING-SEARCH |
 DEPTH-LIMITED-SEARCH |
+BIBF-SEARCH |
 RECURSIVE-BEST-FIRST-SEARCH |
 HILL-CLIMBING |
 SIMULATED-ANNEALING |
