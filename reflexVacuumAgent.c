@@ -67,12 +67,12 @@ impl(
 
     if (!(action = reflexVacuumAgentActionNew()))
       break;
-    if (percept->status == statusDirty)
-      action->action = actionSuck;
-    else if (percept->location == locationA)
-      action->action = actionRight;
-    else if (percept->location == locationB)
-      action->action = actionLeft;
+    if (percept->status == reflexVacuumAgentPerceptStatusDirty)
+      action->act = reflexVacuumAgentActionActSuck;
+    else if (percept->location == reflexVacuumAgentPerceptLocationA)
+      action->act = reflexVacuumAgentActionActMoveRight;
+    else if (percept->location == reflexVacuumAgentPerceptLocationB)
+      action->act = reflexVacuumAgentActionActMoveLeft;
     else
       abort(); /* not in pseudocode */
     reflexVacuumAgentPerceptFree(percept);

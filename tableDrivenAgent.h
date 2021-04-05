@@ -49,9 +49,6 @@ tableDrivenAgentActionFree(
  * return 0 on success
  * return 1 on invocation error
  * return 2 on resource error
- *
- * upon success, channels are created and returned
- * upon error, zeros returned 
  */
 
 int

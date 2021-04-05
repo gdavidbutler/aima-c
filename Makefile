@@ -9,7 +9,7 @@ all: main
 clean:
 	rm -f main $(OBJS)\
 
-main: $(OBJS)
+main: tableDrivenAgent.h reflexVacuumAgent.h $(OBJS)
 	$(CC) -o $@ $(OBJS) $(CHAN_OBJS) -lpthread
 
 main.o: main.c tableDrivenAgent.h

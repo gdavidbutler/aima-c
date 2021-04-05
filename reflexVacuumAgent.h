@@ -18,12 +18,12 @@
 
 struct reflexVacuumAgentPercept {
   enum {
-    locationA
-   ,locationB
+    reflexVacuumAgentPerceptLocationA
+   ,reflexVacuumAgentPerceptLocationB
   } location;
   enum {
-    statusClean /* not in pseudocode */
-   ,statusDirty
+    reflexVacuumAgentPerceptStatusClean /* not in pseudocode */
+   ,reflexVacuumAgentPerceptStatusDirty
   } status;
 };
 
@@ -39,10 +39,10 @@ reflexVacuumAgentPerceptFree(
 
 struct reflexVacuumAgentAction {
   enum {
-    actionSuck
-   ,actionRight
-   ,actionLeft
-  } action;
+    reflexVacuumAgentActionActSuck
+   ,reflexVacuumAgentActionActMoveRight
+   ,reflexVacuumAgentActionActMoveLeft
+  } act;
 };
 
 struct reflexVacuumAgentAction *
@@ -60,9 +60,6 @@ reflexVacuumAgentActionFree(
  * return 0 on success
  * return 1 on invocation error
  * return 2 on resource error
- *
- * upon success, channels are created and returned
- * upon error, zeros returned 
  */
 
 int

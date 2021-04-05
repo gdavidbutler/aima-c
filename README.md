@@ -14,7 +14,7 @@ Then why is C considered *hard*?
 The usual answer is *pointers*.
 The real answer is **choice**.
 C only provides portable access to general processor operations on memory.
-The language has no support for dynamic memory, input or output.
+The language has no support for dynamic memory or I/O (input / output)
 C callable routines (e.g. the [C standard library](https://en.wikipedia.org/wiki/C_standard_library)) must be provided to enable C programs to interface with an environment.
 Everything else is choice.
 
@@ -23,15 +23,10 @@ For example, there are a few conventions used in the book that neither C nor the
 * From the [preface](http://aima.cs.berkeley.edu/newchap00.pdf), "The main unifying theme is the idea of an [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent)."
 * From Appendix B "notes on languages and algorithms", concepts "persistent variables" and "yield".
 
-These concepts can be implemented using various [coroutine](https://en.wikipedia.org/wiki/Coroutine#Implementations_for_C) techniques.
-However, for possible parallelism in addition to concurrency, [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads) and [channels](https://github.com/gdavidbutler/pthreadChannel) are used.
-
-Except where C provides support (e.g. functions), threads and channels are used extensively:
-
-* Environments are threads.
-* Agents are threads.
-* Sensors are channels.
-* Actuators are channels.
+These concurrent styles can be implemented using various [coroutine](https://en.wikipedia.org/wiki/Coroutine#Implementations_for_C) techniques but don't enable parallelism.
+For both concurrency and parallelism [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads) is used.
+To reduce the complexity of using threads a [channel](https://github.com/gdavidbutler/pthreadChannel) style is used.
+These choices provide high level clarity and low level performance to the implementation.
 
 If there is nothing in the "C implementation" column, I haven't gotten that far.
 

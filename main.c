@@ -31,7 +31,7 @@ tableDrivenAgentActuatorPrint(
   struct tableDrivenAgentAction *action;
 
   while (chanOp(0, actuator, (void **)&action, chanOpGet) == chanOsGet) {
-    printf("tableDrivenAgentAction: %d\n", action->dummy);
+    printf("tableDrivenAgentAction:\n");
     tableDrivenAgentActionFree(action);
   }
   chanClose(actuator);
@@ -45,9 +45,9 @@ reflexVacuumAgentActuatorPrint(
 
   while (chanOp(0, actuator, (void **)&action, chanOpGet) == chanOsGet) {
     printf("reflexVacuumAgentAction: %s\n"
-    ,action->action == actionSuck ? "Suck" :
-     action->action == actionRight ? "Right" :
-     action->action == actionLeft ? "Left" :
+    ,action->act == reflexVacuumAgentActionActSuck ? "Suck" :
+     action->act == reflexVacuumAgentActionActMoveRight ? "Right" :
+     action->act == reflexVacuumAgentActionActMoveLeft ? "Left" :
      "unknown");
     reflexVacuumAgentActionFree(action);
   }
@@ -58,34 +58,34 @@ int
 main(
   void
 ){
-  void *fifo;
   chan_t *sensor;
   chan_t *actuator;
   int i;
-  pthread_t p;
+  pthread_t p[2]; /* main thread has exit last, to wait for the printing threads */
 
+  /* as required by chan.h */
   chanInit(realloc, free);
 
-  /* this main thread and Print threads constitute an environment */
+  /* main thread and Print threads constitute an environment */
 
-  if (!(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
-   || !(sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
-   || !(fifo = chanFifoDySa((void(*)(void *))tableDrivenAgentPerceptFree, 10, 1))
-   || !(actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))) {
+  /* create sensor and actuator */
+  if (!(sensor = chanCreate(0, 0, (chanSd_t)tableDrivenAgentPerceptFree))
+   || !(actuator = chanCreate(0, 0, (chanSd_t)tableDrivenAgentActionFree))) {
     fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
     return (1);
   }
 
-  /* create agents and threads to get actions from agents' actuator */
+  /* create agent */
   if ((i = tableDrivenAgent(sensor, actuator))) {
     fprintf(stderr, "tableDrivenAgent failed: %d\n", i);
     return (1);
   }
-  if (pthread_create(&p, 0, (void *(*)(void *))tableDrivenAgentActuatorPrint, actuator)) {
+
+  /* give actuator to a thread to get actions from agent */
+  if (pthread_create(&p[0], 0, (void *(*)(void *))tableDrivenAgentActuatorPrint, actuator)) {
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
-  actuator = 0;
 
   /* put percepts on agents' sensor */
   {
@@ -95,7 +95,6 @@ main(
       fprintf(stderr, "tableDrivenAgentPerceptNew failed\n");
       return (1);
     }
-    percept->dummy = 0;
     if (chanOp(0, sensor, (void **)&percept, chanOpPut) != chanOsPut) {
       fprintf(stderr, "chanOp failed\n");
       return (1);
@@ -105,29 +104,31 @@ main(
   /* inform the agent there will be no more percepts */
   chanShut(sensor);
   chanClose(sensor);
-  sensor = 0;
-  /* wait till the Print threads are notified of agents' death */
-  pthread_join(p, 0);
 
   /* rinse and repeat */
 
-  if (!(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
-   || !(sensor = chanCreate(chanFifoDySi, fifo, chanFifoDySd))
-   || !(fifo = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
-   || !(actuator = chanCreate(chanFifoDySi, fifo, chanFifoDySd))) {
-    fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
-    return (1);
+  /* example of using stores greater than one to create sensor and actuator */
+  {
+    void *store;
+
+    if (!(store = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+     || !(sensor = chanCreate(chanFifoDySi, store, chanFifoDySd))
+     || !(store = chanFifoDySa((void(*)(void *))reflexVacuumAgentActionFree, 10, 1))
+     || !(actuator = chanCreate(chanFifoDySi, store, chanFifoDySd))) {
+      fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
+      return (1);
+    }
   }
 
   if ((i = reflexVacuumAgent(sensor, actuator))) {
     fprintf(stderr, "reflexVacuumAgent failed: %d\n", i);
     return (1);
   }
-  if (pthread_create(&p, 0, (void *(*)(void *))reflexVacuumAgentActuatorPrint, actuator)) {
+
+  if (pthread_create(&p[1], 0, (void *(*)(void *))reflexVacuumAgentActuatorPrint, actuator)) {
     fprintf(stderr, "pthread_create failed\n");
     return (1);
   }
-  actuator = 0;
 
   {
     struct reflexVacuumAgentPercept *percept;
@@ -136,7 +137,7 @@ main(
       fprintf(stderr, "reflexVacuumAgentPerceptNew failed\n");
       return (1);
     }
-    percept->location = locationB;
+    percept->location = reflexVacuumAgentPerceptLocationB;
     if (chanOp(0, sensor, (void **)&percept, chanOpPut) != chanOsPut) {
       fprintf(stderr, "chanOp failed\n");
       return (1);
@@ -145,8 +146,10 @@ main(
 
   chanShut(sensor);
   chanClose(sensor);
-  sensor = 0;
-  pthread_join(p, 0);
+
+  /* main thread must exit last */
+  pthread_join(p[0], 0);
+  pthread_join(p[1], 0);
 
   return (0);
 }
