@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "chan.h"
-#include "chanFifo.h"
 #include "tableDrivenAgent.h"
 
 static void

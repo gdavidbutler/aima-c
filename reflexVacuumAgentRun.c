@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "chan.h"
-#include "chanFifo.h"
+#include "chanStr.h"
 #include "reflexVacuumAgent.h"
 
 static void
@@ -59,11 +59,11 @@ main(
   {
     void *store;
 
-    if (!(store = chanFifoDySa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
-     || !(sensor = chanCreate(chanFifoDySi, store, chanFifoDySd))
-     || !(store = chanFifoDySa((void(*)(void *))reflexVacuumAgentActionFree, 10, 1))
-     || !(actuator = chanCreate(chanFifoDySi, store, chanFifoDySd))) {
-      fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
+    if (!(store = chanFlsoSa((void(*)(void *))reflexVacuumAgentPerceptFree, 10, 1))
+     || !(sensor = chanCreate(chanFlsoSi, store, chanFlsoSd))
+     || !(store = chanFlsoSa((void(*)(void *))reflexVacuumAgentActionFree, 10, 1))
+     || !(actuator = chanCreate(chanFlsoSi, store, chanFlsoSd))) {
+      fprintf(stderr, "chanFlsoSa/chanCreate failed\n");
       return (1);
     }
   }

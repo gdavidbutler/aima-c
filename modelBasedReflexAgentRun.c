@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "chan.h"
-#include "chanFifo.h"
 #include "modelBasedReflexAgent.h"
 
 static void
@@ -53,7 +52,7 @@ main(
   /* create sensor and actuator */
   if (!(sensor = chanCreate(0, 0, (chanSd_t)modelBasedReflexAgentPerceptFree))
    || !(actuator = chanCreate(0, 0, (chanSd_t)modelBasedReflexAgentActionFree))) {
-    fprintf(stderr, "chanFifoDySa/chanCreate failed\n");
+    fprintf(stderr, "chanCreate failed\n");
     return (1);
   }
 

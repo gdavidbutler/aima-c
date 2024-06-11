@@ -20,7 +20,6 @@
 #include <string.h>
 #include <pthread.h>
 #include "chan.h"
-#include "chanFifo.h"
 #include "tableDrivenAgent.h"
 
 struct tableDrivenAgentPercept *
